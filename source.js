@@ -31,7 +31,7 @@ function processBib (text) {
 }
 
 function rewriteBibHeader (match, recordType, recordName) {
-  return recordType + recordName.replace(/_/, '').toLowerCase();
+  return recordType + recordName.replace(/_/g, '').toLowerCase();
 }
 
 //
