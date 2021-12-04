@@ -1,13 +1,22 @@
+/* 2021 Jan Provaznik (provaznik@optics.upol.cz)
+ *
+ * Uses the mithril.js library.
+ * Interfaces the api.crossref.org.
+ */
+
 const em = window.m;
 
 const API_PREFIX = 'https://api.crossref.org/works/';
 const API_SUFFIX = '/transform/application/x-bibtex'
 const TAB_SPACES = '  ';
 
-window.addEventListener('load', bootstrap);
-function bootstrap (event) {
-  em.mount(document.body, ComponentResolver);
-}
+/* Bootstrap the interactive application. */
+
+window.addEventListener('load', function (event) {
+  em.mount(document.querySelector('.resolver'), ComponentResolver);
+});
+
+/* Interfacing the api.crossref.org */
 
 function resolveDoi (what) {
   let path = API_PREFIX + what + API_SUFFIX;
@@ -27,29 +36,36 @@ function resolveDoi (what) {
 }
 
 function processBib (text) {
-  return text.replace(/^(@[^\{]+\{)([^,]+)/, rewriteBibHeader).replace(/\t/g, TAB_SPACES);
+  let next = text
+    .replace(/^(@[^\{]+\{)([^,]+)/, rewriteBibHeader)
+    .replace(/\t/g, TAB_SPACES);
+  
+  return window
+    .decodeURIComponent(next);
 }
 
 function rewriteBibHeader (match, recordType, recordName) {
   return recordType + recordName.replace(/_/g, '').toLowerCase();
 }
 
-//
+/* Application logic. */
 
 class ComponentResolver {
   view () {
-    return em('.resolver', [
+    return em('.row', [
       em('.column.control', [
-        em('textarea', { 
+        em('textarea.row', { 
           oninput     : this.handleTextareaInput.bind(this),
           disabled    : this.isWorking,
           placeholder : 'Enter line-separated DOI names.'
         }, this.textareaValue),
-        em('button', {
-          onclick     : this.handleButtonResolve.bind(this),
-          disabled    : this.isWorking
-        }, this.isWorking ? 'retrieving...' : 'retrieve biblatex entries'),
-        this.isWorking ? em('.loading') : []
+        em('.row', [
+          em('button', {
+            onclick     : this.handleButtonResolve.bind(this),
+            disabled    : this.isWorking
+          }, this.isWorking ? 'retrieving...' : 'retrieve biblatex entries'),
+          this.isWorking ? em('.loading') : []
+        ])
       ]),
       em('.column.results', [
         this.resolvedRecords.map(record => {
@@ -74,8 +90,8 @@ class ComponentResolver {
 
   handleButtonResolve (event) {
     this.isWorking = true;
+    this.requestQueue = processLines(this.textareaValue);
     this.resolvedRecords = [];
-    this.requestQueue = (this.textareaValue ?? '').split('\n').filter(line => line.length);
 
     this.processQueue();
   }
@@ -93,8 +109,28 @@ class ComponentResolver {
       .catch(error => console.error(error))
       .finally(nil => {
         em.redraw();
-        this.processQueue()
+        schedule50ms(this.processQueue.bind(this))
       });
   }
 }
 
+/* Utility. */
+
+function processLines (blob) {
+  return (blob ?? '')
+    .split('\n')
+    .filter(line => line.length > 0)
+    .map(line => {
+      let match = line.match(/doi\.org\/([^\s]+)$/);
+      if (match)
+        line = match[1];
+
+      return line.trim();
+    })
+}
+
+/* Rudimentary rate limiting (keeps ~ 20 requests / second). */
+
+function schedule50ms (callback) {
+  window.setTimeout(callback, 50)
+}

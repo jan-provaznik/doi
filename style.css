@@ -1,10 +1,18 @@
+/* 2021 Jan Provaznik (provaznik@optics.upol.cz)
+ *
+ * Uses the reset.css library.
+ */
+
 * {
   box-sizing: border-box;
 }
 
-.resolver {
+/* Layout utilities */
+
+.row {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 
 .column {
@@ -16,6 +24,8 @@
   margin-left: 0.5rem;
 }
 
+/* Column definitions. */
+
 .column.control {
   flex: 1 1 33%;
 }
@@ -24,15 +34,19 @@
   flex: 1 1 66%;
 }
 
-textarea, pre {
+/* Individual records in .results wrapper */
+
+.results pre {
+  padding: 0.5rem;
+
+  white-space: pre-wrap;
   font-family: monospace;
   line-height: 110%;
-
-  padding: 0.5rem;
 }
 
-pre {
-  white-space: pre-wrap;
+.results pre.failed {
+  user-select: none;
+  background: #f7c200 !important;
 }
 
 .results pre:nth-child(odd) {
@@ -40,21 +54,27 @@ pre {
 }
 
 .results pre:nth-child(even) {
-  background: #cfcfcf;
+  background: #e4f4ff;
 }
 
 .results pre + pre {
   margin-top: 0.5rem
 }
 
+/* Controls in .controls wrapper */
+
 .control textarea {
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+
   width: 100%;
   min-height: 75vh;
 
   border: 1px solid #ccc;
   border-radius: 5px;
 
-  margin-bottom: 1rem;
+  font-family: monospace;
+  line-height: 110%;
 }
 
 .control textarea:focus {
@@ -63,11 +83,12 @@ pre {
 }
 
 .control button {
-  text-transform: uppercase;
   padding: 1em 1.5em;
 
-  letter-spacing: 2px;
   font-weight: 600;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 
   color: #fff;
   background: #33C3F0;
@@ -85,16 +106,38 @@ pre {
   background: #ccc;
 }
 
-.failed {
-  user-select: none;
-  background: #ffaaaa !important;
-}
-
-.loading {
-  background: url('lib/loading.gif');
+.control .loading {
+  background: url('assets/ghost.gif');
   background-size: contain;
   width: 48px;
   height: 48px;
-  float: right;
+}
+
+/* Header of the site. */
+
+.header {
+  padding: 1rem;
+  padding-bottom: 0;
+
+  font-family: sans-serif;
+}
+
+.header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.header p {
+  padding-top: 1rem;
+}
+
+.header a {
+  color: #33C3F0;
+}
+
+.header a:hover {
+  color: #776b98;
 }
 
