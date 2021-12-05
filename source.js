@@ -162,12 +162,13 @@ class ComponentResolver {
     this.requestQueue = [];
     this.textareaValue = '';
 
-    //
+    /*
     this.resolvedRecords = [
       { success: true, doi: 'test/1', bib: '@article{test1, doi = {test/1}}' },
       { success: true, doi: 'test/2', bib: '@article{test2, doi = {test/2}}' },
       { success: true, doi: 'test/3', bib: '@article{test3, doi = {test/3}}' },
     ]
+    */
   }
 
   /* Record retrieval. */
