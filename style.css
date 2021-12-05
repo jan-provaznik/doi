@@ -7,12 +7,55 @@
   box-sizing: border-box;
 }
 
+/* Shared elements. */
+
+button {
+  padding: 1em 1.5em;
+
+  font-weight: 600;
+  font-family: sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+
+  color: #fff;
+  background: #33C3F0;
+  border: none;
+  border-radius: 5px;
+}
+
+button:hover {
+  color: #fff;
+  background: #776b98;
+}
+
+button:disabled, 
+button.highlight:disabled,
+button.highlight:disabled:hover {
+  color: #666;
+  background: #ccc;
+}
+
+button.highlight {
+  background: #f7c200;
+}
+
+button.highlight:hover {
+  background: #d47304;
+}
+
 /* Layout utilities */
 
 .row {
   display: flex;
   flex-direction: row;
+}
+
+.row.apart {
   justify-content: space-between;
+}
+
+.row.together {
+  justify-content: flex-start;
 }
 
 .column {
@@ -61,6 +104,14 @@
   margin-top: 0.5rem
 }
 
+.results .buttons {
+  margin-bottom: 1rem;
+}
+
+.results .buttons * + * {
+  margin-left: 1rem;
+}
+
 /* Controls in .controls wrapper */
 
 .control textarea {
@@ -80,30 +131,6 @@
 .control textarea:focus {
   border: 1px solid #333;
   outline: none !important;
-}
-
-.control button {
-  padding: 1em 1.5em;
-
-  font-weight: 600;
-  font-family: sans-serif;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-
-  color: #fff;
-  background: #33C3F0;
-  border: none;
-  border-radius: 5px;
-}
-
-.control button:hover {
-  color: #fff;
-  background: #776b98;
-}
-
-.control button:disabled {
-  color: #666;
-  background: #ccc;
 }
 
 .control .loading {
