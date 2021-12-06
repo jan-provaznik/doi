@@ -7,7 +7,7 @@
 const em = window.m;
 
 const API_PREFIX = 'https://api.crossref.org/works/';
-const API_SUFFIX = '/transform/application/x-bibtex'
+const API_SUFFIX = '/transform/application/x-bibtex';
 const TAB_SPACES = '  ';
 
 /* Bootstrap the interactive application. */
@@ -32,7 +32,7 @@ function resolveDoi (what) {
             doi : what
           };
         });
-    })
+    });
 }
 
 function processBib (text) {
@@ -85,15 +85,17 @@ class ComponentResolver {
     return em('.column.results', [
       this.viewResultsButtons(),
       this.resolvedRecords.map(record => {
-        if (record.success)
+        if (record.success) {
           return em('pre', record.bib)
+        }
+
         return em('pre.failed', 'Could not resolve [' + record.doi + ']');
       })
-    ])
+    ]);
   }
 
   viewResultsButtons () {
-    let disable = this.isWorking || !this.resolvedRecords.filter(record => record.success).length
+    let disable = this.isWorking || !this.resolvedRecords.filter(record => record.success).length;
     return em('.buttons.row.together', [
       em('button', {
         onclick   : this.handleButtonClipboard.bind(this),
@@ -117,7 +119,7 @@ class ComponentResolver {
 
   handleButtonWindow () {
     let url = this.createRecordsURL();
-    let win = window.open(url, '_blank')
+    let win = window.open(url, '_blank');
 
     let timer = window.setInterval(nil => {
       if (win.closed) {
@@ -181,6 +183,7 @@ class ComponentResolver {
     }
 
     let what = this.requestQueue.shift();
+
     resolveDoi(what)
       .then(record => this.resolvedRecords.push(record))
       .catch(error => console.error(error))
@@ -214,18 +217,22 @@ class ComponentResolver {
 function processLines (blob) {
   return (blob ?? '')
     .split('\n')
+    .map(line => line.trim())
     .filter(line => line.length > 0)
     .map(line => {
-      let match = line.match(/doi\.org\/([^\s]+)$/);
-      if (match)
+      let match;
+
+      if (match = line.match(/doi\.org\/([^\s]+)$/)) {
         line = match[1];
+      }
 
       return line.trim();
-    })
+    });
 }
 
 /* Rudimentary rate limiting (keeps ~ 20 requests / second). */
 
 function schedule50ms (callback) {
-  window.setTimeout(callback, 50)
+  return window
+    .setTimeout(callback, 50);
 }

@@ -21,6 +21,8 @@ button {
   background: #33C3F0;
   border: none;
   border-radius: 5px;
+
+  cursor: pointer;
 }
 
 button:hover {
@@ -33,6 +35,8 @@ button.highlight:disabled,
 button.highlight:disabled:hover {
   color: #666;
   background: #ccc;
+
+  cursor: default;
 }
 
 button.highlight {
