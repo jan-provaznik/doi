@@ -426,17 +426,16 @@ class ComponentResolver {
 function processLines (blob) {
   return (blob ?? '')
     .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .map(line => {
-      let match;
+    .reduce(processLine, []);
+}
 
-      if (match = line.match(/doi\.org\/([^\s]+)$/)) {
-        line = match[1];
-      }
+function processLine (list, line) {
+  let part = line.match(/doi\.org\/([^\s]+)/);
+  if (part) {
+    list.push(part[1]);
+  }
 
-      return line.trim();
-    });
+  return list;
 }
 
 // Rudimentary rate limiting (keeps ~ 20 requests / second).
