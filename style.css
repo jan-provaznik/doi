@@ -1,4 +1,4 @@
-/* 2021 Jan Provaznik (provaznik@optics.upol.cz)
+/* 2021 - 2022 Jan Provaznik (jan@provaznik.pro)
  *
  * Uses the reset.css library.
  */
@@ -142,6 +142,14 @@ button.highlight:hover {
   background-size: contain;
   width: 48px;
   height: 48px;
+}
+
+.control label {
+  padding: 1em 0;
+}
+
+.control label code {
+  font-family: monospace;
 }
 
 /* Header of the site. */

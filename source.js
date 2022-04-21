@@ -1,54 +1,239 @@
-/* 2021 Jan Provaznik (provaznik@optics.upol.cz)
+/* 2021 - 2022 Jan Provaznik (jan@provaznik.pro)
  *
- * Uses the mithril.js library.
- * Interfaces the api.crossref.org.
+ * Roses are red
+ * Violets are blue
+ * If bibliography makes you sad
+ * This might help you
+ *
+ * Version 1.1-0
+ *
  */
 
 const em = window.m;
 
-const API_PREFIX = 'https://api.crossref.org/works/';
-const API_SUFFIX = '/transform/application/x-bibtex';
+const API_PREFIX = 'https://doi.org/';
 const TAB_SPACES = '  ';
 
-/* Bootstrap the interactive application. */
+// Bootstrap the interactive application.
+//
 
 window.addEventListener('load', function (event) {
   em.mount(document.querySelector('.resolver'), ComponentResolver);
 });
 
-/* Interfacing the api.crossref.org */
+// Per https://stackoverflow.com/a/37511463 we remove accents and other
+// stuff from names.
+//
+
+function toAscii (value) {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+// Interfacing https://doi.org
+//
 
 function resolveDoi (what) {
-  let path = API_PREFIX + what + API_SUFFIX;
+  let path = API_PREFIX + what;
   return window
-    .fetch(path)
+    .fetch(path, {
+      headers: { 
+        'accept' : 'application/vnd.citationstyles.csl+json' 
+      } 
+    })
     .then(response => {
       return response
         .text()
         .then(content => {
+          let csl = JSON.parse(content);
+
           return {
             success : response.ok,
-            bib : processBib(content),
+            bib : createBib(csl),
             doi : what
           };
-        });
+        })
+        .catch(error => {
+          return {
+            success : false,
+            bib : null,
+            doi : what
+          };
+        })
     });
 }
 
-function processBib (text) {
-  let next = text
-    .replace(/^(@[^\{]+\{)([^,]+)/, rewriteBibHeader)
-    .replace(/\t/g, TAB_SPACES);
-  
-  return window
-    .decodeURIComponent(next);
+// CSL https://docs.citationstyles.org/en/stable/specification.html
+// implementation.
+//
+
+function cslDate (csl) {
+  let parts = csl['issued']['date-parts'][0];
+
+  if (parts.length == 3) {
+      return {
+        year  : parts[0],
+        month : parts[1],
+        day   : parts[2]
+      };
+  }
+
+  if (parts.length > 0) {
+    return {
+      year : parts[0]
+    };
+  }
 }
 
-function rewriteBibHeader (match, recordType, recordName) {
-  return recordType + recordName.replace(/_/g, '').toLowerCase();
+function cslAuthors (csl) {
+  let authors = csl['author'];
+  return authors.map(author => {
+    return {
+      sname : author.family,
+      gname : author.given
+    };
+  });
 }
 
-/* Application logic. */
+function cslTitle (csl) {
+  return csl['title'];
+}
+
+function cslJournalTitle (csl) {
+  return csl['container-title'];
+}
+
+function cslJournalIssue (csl) {
+  return csl['issue'];
+}
+
+function cslJournalVolume (csl) {
+  return csl['volume'];
+}
+
+function cslJournalPublisher (csl) {
+  return csl['publisher'];
+}
+
+function cslURL (csl) {
+  return csl['URL'];
+}
+
+function cslDOI (csl) {
+  return csl['DOI'];
+}
+
+// BibTeX https://ctan.org/pkg/biblatex?lang=en
+// generator implementation.
+//
+
+function createBibRecord (key, val) {
+  return {
+    key: key,
+    val: val
+  };
+}
+
+function createBibTitle (csl) {
+  return createBibRecord('title', cslTitle(csl));
+}
+
+function createBibAuthor (csl) {
+  let d = cslAuthors(csl)
+    .map(each => {
+      return (each.sname + ', ' + each.gname)
+    })
+    .join(' and ');
+  return createBibRecord('author', d);
+}
+
+function createBibDate (csl) {
+  const d = cslDate(csl);
+  const f = []
+
+  if (d.year) {
+    f.push(createBibRecord('year', d.year));
+  }
+  if (d.month) {
+    f.push(createBibRecord('month', d.month));
+  }
+  if (d.day) {
+    f.push(createBibRecord('day', d.day));
+  }
+
+  return f;
+}
+
+function createBibJournal (csl) {
+  return createBibRecord('journal', cslJournalTitle(csl));
+}
+
+function createBibNumber (csl) {
+  return createBibRecord('number', cslJournalIssue(csl));
+}
+
+function createBibVolume (csl) {
+  return createBibRecord('volume', cslJournalVolume(csl));
+}
+
+function createBibPublisher (csl) {
+  return createBibRecord('publisher', cslJournalPublisher(csl));
+}
+
+function createBibURL (csl) {
+  return createBibRecord('url', cslURL(csl));
+}
+
+function createBibDOI (csl) {
+  return createBibRecord('doi', cslDOI(csl));
+}
+
+function createBib (csl) {
+  let F = []
+
+  F.push(createBibTitle(csl));
+  F.push(createBibAuthor(csl));
+
+  F.push(... createBibDate(csl));
+
+  F.push(createBibNumber(csl));
+  F.push(createBibVolume(csl));
+  F.push(createBibJournal(csl));
+  F.push(createBibPublisher(csl));
+
+  F.push(createBibURL(csl));
+  F.push(createBibDOI(csl));
+
+  // 
+
+  let bibType = csl.type.replace(/journal-/, '');
+  let bibName = createBibLabel(csl);
+  let bibBody = F
+    .filter(record => record.val)
+    .map(record => {
+      return ('  ' + record.key + ' = {' + record.val + '}');
+    })
+    .join(', \n');
+
+  //
+
+  return ('@' + bibType + '{' + bibName + '\n' + bibBody + '\n' + '}')
+}
+
+function createBibLabel (csl) {
+  let labelAuthor = cslAuthors(csl)[0].sname
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\W/, '');
+  let labelYear = cslDate(csl).year;
+
+  return labelAuthor + labelYear;
+}
+
+// Application logic.
+//
 
 class ComponentResolver {
 
@@ -163,14 +348,6 @@ class ComponentResolver {
     this.resolvedRecords = [];
     this.requestQueue = [];
     this.textareaValue = '';
-
-    /*
-    this.resolvedRecords = [
-      { success: true, doi: 'test/1', bib: '@article{test1, doi = {test/1}}' },
-      { success: true, doi: 'test/2', bib: '@article{test2, doi = {test/2}}' },
-      { success: true, doi: 'test/3', bib: '@article{test3, doi = {test/3}}' },
-    ]
-    */
   }
 
   /* Record retrieval. */
@@ -212,7 +389,8 @@ class ComponentResolver {
 
 }
 
-/* Utility. */
+// Utility.
+//
 
 function processLines (blob) {
   return (blob ?? '')
@@ -230,9 +408,11 @@ function processLines (blob) {
     });
 }
 
-/* Rudimentary rate limiting (keeps ~ 20 requests / second). */
+// Rudimentary rate limiting (keeps ~ 20 requests / second).
+//
 
 function schedule50ms (callback) {
   return window
     .setTimeout(callback, 50);
 }
+
