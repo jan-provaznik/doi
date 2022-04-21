@@ -5,7 +5,7 @@
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.1-1
+ * Version 1.1-2
  *
  */
 
@@ -224,10 +224,8 @@ function createBib (csl) {
 }
 
 function createBibLabelName (csl) {
-  let labelAuthor = cslAuthors(csl)[0].sname
+  let labelAuthor = toAscii(cslAuthors(csl)[0].sname)
     .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
     .replace(/\W/, '');
   let labelYear = cslDate(csl).year;
 
@@ -235,12 +233,13 @@ function createBibLabelName (csl) {
 }
 
 function createBibLabelType(csl) {
-  if (csl.type.match(/journal-/)) {
-    return 'article';
-  }
 
   if (csl.type.match(/proceedings-/)) {
     return 'inproceedings';
+  }
+
+  if (csl.type.match(/journal-|article/)) {
+    return 'article';
   }
 
   return 'misc';
