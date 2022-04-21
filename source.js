@@ -5,7 +5,7 @@
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.1-2
+ * Version 1.1-3
  *
  */
 
@@ -71,7 +71,25 @@ function resolveDoi (what) {
 //
 
 function cslDate (csl) {
-  let parts = csl['issued']['date-parts'][0];
+  for (let key of [ 'issued', 'created' ]) {
+    try {
+      let value = _cslDate(csl, key);
+      if (value.year) {
+        return value;
+      }
+    }
+    catch {
+    }
+  }
+
+  return {
+    year : 9999
+  };
+
+}
+
+function _cslDate (csl, key) {
+  let parts = csl[key]['date-parts'][0];
 
   if (parts.length == 3) {
       return {
@@ -350,10 +368,10 @@ class ComponentResolver {
   }
 
   view () {
-    return em('.row', [
+    return [
       this.viewControls(),
       this.viewResults(),
-    ]);
+    ];
   }
 
   constructor (vnode) {
