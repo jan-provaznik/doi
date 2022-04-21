@@ -200,3 +200,20 @@ a:hover {
   font-family: sans-serif;
   font-size: small;
 }
+
+/* ... */
+
+noscript {
+  width: 100%;
+  align-self: center;
+  justify-self: center;
+}
+
+.nojs {
+  align-items: center;
+}
+
+.nojs p {
+  font-family: sans-serif;
+  font-weight: bold;
+}

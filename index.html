@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 
-    <title>BibLaTeX record generator</title>
+    <title>BibLaTeX database record generator</title>
 
     <!-- external libraries -->
 
@@ -27,16 +27,24 @@
       -->
 
       <section class="row row-main resolver">
+        <noscript>
+          <div class='nojs column'>
+            <p>You'll need to enable Javascript for this to work.</p>
+          </div>
+        </noscript>
       </section>
 
       <section class="row row-foot footer">
         <p>
-          Runs completely in your browser. Uses <b>no</b> cookies of its own.
-          Uses <a href="https://doi.org">doi.org</a> service to retrieve citation information.
+          Runs completely in the browser. 
+          Uses <a href="https://doi.org">doi.org</a> to retrieve citations.
           Relies on the
-          <a href="https://icons8.com/preloaders/">Ghost animation</a> while fetching the data.
-          Employs <a href="https://mithril.js.org/">Mithril</a> for interaction.
-          Code available from <a href="https://github.com/jan-provaznik/doi">GitHub</a>.
+          <a href="https://icons8.com/preloaders/">Ghost animation</a> while
+          fetching the data.
+          Employs <a href="https://mithril.js.org/">Mithril</a> for user interface.
+          Makes use of <a href="https://meyerweb.com/eric/tools/css/reset/">reset.css</a> 
+          to normalize browser behavior.
+          Complete source code available on <a href="https://github.com/jan-provaznik/doi">GitHub</a>.
         </p>
       </section>
   </body>

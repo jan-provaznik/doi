@@ -316,15 +316,15 @@ class ComponentResolver {
       em('button', {
         onclick   : this.handleButtonClipboard.bind(this),
         disabled  : disable
-      }, 'Copy results to cliboard'),
+      }, 'Copy to clipboard'),
       em('button', {
         onclick   : this.handleButtonWindow.bind(this),
         disabled  : disable
-      }, 'Open results in new window'),
+      }, 'Open in new window'),
       em('button.highlight', {
         onclick   : this.handleButtonDownload.bind(this),
         disabled  : disable
-      }, 'Download results')
+      }, 'Download database')
     ]);
   }
 

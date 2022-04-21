@@ -1,2 +1,12 @@
-BibLaTeX record generator.
+In-browser BibLaTeX database record generator.
+
+Uses https://doi.org to retrieve standardized citation information and
+transforms it into corresponding BibLaTeX database.
+
+Acknowledgments
+
+  - Uses Mithril.js for user interface
+  - Uses Ghost animation from icons8.com
+  - Uses reset.css to normalize browser behavior
+
 
