@@ -55,6 +55,8 @@ function resolveDoi (what) {
           };
         })
         .catch(error => {
+          console.error(error);
+
           return {
             success : false,
             bib : null,
@@ -207,8 +209,8 @@ function createBib (csl) {
 
   // 
 
-  let bibType = csl.type.replace(/journal-/, '');
-  let bibName = createBibLabel(csl);
+  let bibLabelType = createBibLabelType(csl);
+  let bibLabelName = createBibLabelName(csl);
   let bibBody = F
     .filter(record => record.val)
     .map(record => {
@@ -218,10 +220,10 @@ function createBib (csl) {
 
   //
 
-  return ('@' + bibType + '{' + bibName + '\n' + bibBody + '\n' + '}')
+  return ('@' + bibLabelType + '{' + bibLabelName + ',\n' + bibBody + '\n' + '}')
 }
 
-function createBibLabel (csl) {
+function createBibLabelName (csl) {
   let labelAuthor = cslAuthors(csl)[0].sname
     .toLowerCase()
     .normalize('NFD')
@@ -230,6 +232,18 @@ function createBibLabel (csl) {
   let labelYear = cslDate(csl).year;
 
   return labelAuthor + labelYear;
+}
+
+function createBibLabelType(csl) {
+  if (csl.type.match(/journal-/)) {
+    return 'article';
+  }
+
+  if (csl.type.match(/proceedings-/)) {
+    return 'inproceedings';
+  }
+
+  return 'misc';
 }
 
 // Application logic.
