@@ -5,7 +5,7 @@
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.1-3
+ * Version 1.2-0
  *
  */
 
@@ -424,16 +424,30 @@ class ComponentResolver {
 //
 
 function processLines (blob) {
-  return (blob ?? '')
+  let list = (blob ?? '')
     .split('\n')
-    .reduce(processLine, []);
+    .reduce(processLine, [])
+    .map(each => each.toLowerCase());
+  return [ ... new Set(list) ];
 }
 
+// Every DOI starts with the following prefix: '10.' followed by at least 4
+// digits which may be followed by additional dots and digits. A slash '/' then
+// separated the prefix from the suffix which may contain essentially enything,
+// including spaces, use of which is, however, discouraged.
+//
+// https://www.medra.org/en/DOI.htm
+// https://en.wikipedia.org/wiki/Digital_object_identifier
+
 function processLine (list, line) {
-  let part = line.match(/doi\.org\/([^\s]+)/);
-  if (part) {
-    list.push(part[1]);
-  }
+
+  let urlMatches = line.matchAll(/doi\.org\/([^\s]+)/ig);
+  let doiMatches = line.matchAll(/(10\.[\.\d]+\/[^\s]+)/ig);
+
+  list.push( ... new Set([
+    ... Array.from(urlMatches).map(match => match[1].toLowerCase()),
+    ... Array.from(doiMatches).map(match => match[1].toLowerCase())
+  ]));
 
   return list;
 }
