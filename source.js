@@ -5,7 +5,7 @@
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.2-0
+ * Version 1.3-0
  *
  */
 
@@ -132,6 +132,10 @@ function cslJournalVolume (csl) {
   return csl['volume'];
 }
 
+function cslJournalPage (csl) {
+  return csl['page'];
+}
+
 function cslJournalPublisher (csl) {
   return csl['publisher'];
 }
@@ -185,6 +189,8 @@ function createBibDate (csl) {
   return f;
 }
 
+// 
+
 function createBibJournal (csl) {
   return createBibRecord('journal', cslJournalTitle(csl));
 }
@@ -195,6 +201,10 @@ function createBibNumber (csl) {
 
 function createBibVolume (csl) {
   return createBibRecord('volume', cslJournalVolume(csl));
+}
+
+function createBibPages (csl) {
+  return createBibRecord('pages', cslJournalPage(csl));
 }
 
 function createBibPublisher (csl) {
@@ -220,6 +230,7 @@ function createBib (csl) {
   F.push(createBibNumber(csl));
   F.push(createBibVolume(csl));
   F.push(createBibJournal(csl));
+  F.push(createBibPages(csl));
   F.push(createBibPublisher(csl));
 
   F.push(createBibURL(csl));
@@ -441,8 +452,8 @@ function processLines (blob) {
 
 function processLine (list, line) {
 
-  let urlMatches = line.matchAll(/doi\.org\/([^\s]+)/ig);
-  let doiMatches = line.matchAll(/(10\.[\.\d]+\/[^\s]+)/ig);
+  let urlMatches = line.matchAll(/doi\.org\/([^\s\}]+)/ig);
+  let doiMatches = line.matchAll(/(10\.[\.\d]+\/[^\s\}]+)/ig);
 
   list.push( ... new Set([
     ... Array.from(urlMatches).map(match => match[1].toLowerCase()),

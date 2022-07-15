@@ -9,4 +9,7 @@ Acknowledgments
   - Uses Ghost animation from icons8.com
   - Uses reset.css to normalize browser behavior
 
+Changes
+
+  2022-07-15 Added support for 'pages' BibLaTeX entry.
 
