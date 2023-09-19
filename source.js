@@ -5,7 +5,7 @@
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.3-0
+ * Version 1.4-0
  *
  */
 
@@ -13,6 +13,22 @@ const em = window.m;
 
 const API_PREFIX = 'https://doi.org/';
 const TAB_SPACES = '  ';
+
+//
+
+const TEX = createMappingTeX()
+
+function toTeX (value) {
+  return Array.from(value).map(letter => {
+    let code = letter.charCodeAt();
+    if (TEX.has(code)) {
+      return TEX.get(code);
+    }
+    else {
+      return letter;
+    }
+  }).join('')
+}
 
 // Bootstrap the interactive application.
 //
@@ -160,13 +176,13 @@ function createBibRecord (key, val) {
 }
 
 function createBibTitle (csl) {
-  return createBibRecord('title', cslTitle(csl));
+  return createBibRecord('title', toTeX(cslTitle(csl)));
 }
 
 function createBibAuthor (csl) {
   let d = cslAuthors(csl)
     .map(each => {
-      return (each.sname + ', ' + each.gname)
+      return (toTeX(each.sname) + ', ' + toTeX(each.gname));
     })
     .join(' and ');
   return createBibRecord('author', d);
