@@ -1,4 +1,4 @@
-/* 2021 - 2022 Jan Provaznik (jan@provaznik.pro)
+/* 2021 - 2023 Jan Provaznik (jan@provaznik.pro)
  *
  * Uses the reset.css library.
  */
@@ -98,29 +98,38 @@ button.highlight:hover {
 
 /* Individual records in .results wrapper */
 
-.results pre {
+.results .record {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.results .record + * {
+  margin-top: 0.5rem
+}
+
+.results .record pre {
   padding: 0.5rem;
 
   white-space: pre-wrap;
   font-family: monospace;
   line-height: 110%;
+
+  flex-grow: 1;
 }
 
-.results pre.failed {
-  user-select: none;
-  background: #f7c200 !important;
-}
-
-.results pre:nth-child(odd) {
+.results .record:nth-child(odd) pre {
   background: #efefef;
 }
 
-.results pre:nth-child(even) {
+.results .record:nth-child(even) pre {
   background: #e4f4ff;
 }
 
-.results pre + pre {
-  margin-top: 0.5rem
+.results .record pre.failed {
+  user-select: none;
+  background: #f7c200 !important;
 }
 
 .results .buttons {

@@ -1,11 +1,11 @@
-/* 2021 - 2022 Jan Provaznik (jan@provaznik.pro)
+/* 2021 - 2023 Jan Provaznik (jan@provaznik.pro)
  *
  * Roses are red
  * Violets are blue
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.4-0
+ * Version 1.5-0
  *
  */
 
@@ -13,6 +13,10 @@ const em = window.m;
 
 const API_PREFIX = 'https://doi.org/';
 const TAB_SPACES = '  ';
+
+//
+
+const SCI_PREFIX = 'https://sci-hub.se/';
 
 //
 
@@ -329,10 +333,19 @@ class ComponentResolver {
       this.viewResultsButtons(),
       this.resolvedRecords.map(record => {
         if (record.success) {
-          return em('pre', record.bib)
+          return em('.record', [
+            em('pre', record.bib),
+            em('a.sci', { 
+              href : SCI_PREFIX + record.doi, 
+              target : '_blank',
+              title : 'Might not work for recent publications.'
+            }, '𓅪'),
+          ]);
         }
 
-        return em('pre.failed', 'Could not resolve [' + record.doi + ']');
+        return em('.record', [
+          em('pre.failed', 'Could not resolve [' + record.doi + ']')
+        ]);
       })
     ]);
   }
