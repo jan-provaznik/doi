@@ -5,7 +5,7 @@
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.5-0
+ * Version 1.5-1
  *
  */
 
@@ -17,6 +17,7 @@ const TAB_SPACES = '  ';
 //
 
 const SCI_PREFIX = 'https://sci-hub.se/';
+const DOI_PREFIX = 'https://dx.doi.org/';
 
 //
 
@@ -71,7 +72,7 @@ function resolveDoi (what) {
           return {
             success : response.ok,
             bib : createBib(csl),
-            doi : what
+            doi : what,
           };
         })
         .catch(error => {
@@ -80,7 +81,7 @@ function resolveDoi (what) {
           return {
             success : false,
             bib : null,
-            doi : what
+            doi : what,
           };
         })
     });
@@ -335,11 +336,18 @@ class ComponentResolver {
         if (record.success) {
           return em('.record', [
             em('pre', record.bib),
-            em('a.sci', { 
-              href : SCI_PREFIX + record.doi, 
-              target : '_blank',
-              title : 'Might not work for recent publications.'
-            }, '𓅪'),
+            em('.links', [
+              em('a.url', {
+                href : DOI_PREFIX + record.doi,
+                target : '_blank', 
+                title : 'The official link associated with the DOI.'
+              }, '✪'),
+              em('a.sci', { 
+                href : SCI_PREFIX + record.doi, 
+                target : '_blank',
+                title : 'Recent or open-access publications might not be available there.'
+              }, '𓅪')
+            ])
           ]);
         }
 

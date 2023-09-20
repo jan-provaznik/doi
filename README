@@ -11,5 +11,8 @@ Acknowledgments
 
 Changes
 
+  2023-09-20 Added buttons to external links for resolved records.
+  2023-09-19 Added support for TeX escape sequences for UTF-8 unfriendly 
+             envrionments.
   2022-07-15 Added support for 'pages' BibLaTeX entry.
 

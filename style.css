@@ -132,6 +132,21 @@ button.highlight:hover {
   background: #f7c200 !important;
 }
 
+.results .record .links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.results .record .links a {
+  color: #000;
+}
+
+.results .record .links a:hover {
+  color: #ff1010;
+}
+
 .results .buttons {
   margin-bottom: 1rem;
 }
