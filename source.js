@@ -68,6 +68,7 @@ function resolveDoi (what) {
         .text()
         .then(content => {
           let csl = JSON.parse(content);
+          console.log(csl)
 
           return {
             success : response.ok,
@@ -132,7 +133,13 @@ function cslAuthors (csl) {
   return authors.map(author => {
     return {
       sname : author.family,
-      gname : author.given
+      gname : author.given,
+
+      /* Plain 'name' field is used in 
+       * https://doi.org/10.1038/s41592-019-0686-2
+       */
+
+      xname : author.name
     };
   });
 }
@@ -187,6 +194,13 @@ function createBibTitle (csl) {
 function createBibAuthor (csl) {
   let d = cslAuthors(csl)
     .map(each => {
+      /* A hack to support https://doi.org/10.1038/s41592-019-0686-2
+       * see cslAuthors for more
+       */
+
+      if (each.xname)
+        return toTeX(each.xname)
+
       return (toTeX(each.sname) + ', ' + toTeX(each.gname));
     })
     .join(' and ');
