@@ -72,6 +72,7 @@ function resolveDoi (what) {
 
           return {
             success : response.ok,
+            label : createBibLabelName(csl),
             bib : createBib(csl),
             doi : what,
           };
@@ -129,7 +130,7 @@ function _cslDate (csl, key) {
 }
 
 function cslAuthors (csl) {
-  let authors = csl['author'];
+  let authors = (csl['author'] || []);
   return authors.map(author => {
     return {
       sname : author.family,
@@ -191,20 +192,45 @@ function createBibTitle (csl) {
   return createBibRecord('title', toTeX(cslTitle(csl)));
 }
 
+function cslStandardsBody (csl) {
+  const body = csl['standards-body']
+  return {
+    name : body?.name,
+    acronym : body?.acronym
+  }
+}
+
+function cslType (csl) {
+  return (csl?.type ?? 'misc')
+}
+
+function cslTypeStandard (csl) {
+  return cslType(csl) === 'standard'
+}
+
 function createBibAuthor (csl) {
-  let d = cslAuthors(csl)
-    .map(each => {
+  let allAuthors = cslAuthors(csl)
+
+  if (allAuthors.length) {
+    let allAuthorsNamed = allAuthors.map(each => {
       /* A hack to support https://doi.org/10.1038/s41592-019-0686-2
        * see cslAuthors for more
        */
-
       if (each.xname)
         return toTeX(each.xname)
-
       return (toTeX(each.sname) + ', ' + toTeX(each.gname));
     })
-    .join(' and ');
-  return createBibRecord('author', d);
+    return createBibRecord('author',
+      allAuthorsNamed.join(' and '))
+  }
+
+  if (cslTypeStandard(csl)) {
+    let stdAuthor= cslStandardsBody(csl)
+    if (stdAuthor.name)
+      return createBibRecord('author', toTeX(stdAuthor.name))
+  }
+
+  return createBibRecord('author', '')
 }
 
 function createBibDate (csl) {
@@ -288,12 +314,25 @@ function createBib (csl) {
 }
 
 function createBibLabelName (csl) {
-  let labelAuthor = toAscii(cslAuthors(csl)[0].sname)
-    .toLowerCase()
-    .replace(/\W/, '');
+  let allAuthors = cslAuthors(csl)
   let labelYear = cslDate(csl).year;
 
-  return labelAuthor + labelYear;
+  if (allAuthors.length) {
+    let firstAuthor = allAuthors.shift()
+    let labelAuthor = toAscii(firstAuthor.sname)
+      .toLowerCase()
+      .replace(/\W/, '');
+    return labelAuthor + labelYear;
+  }
+
+  if (cslTypeStandard(csl)) {
+    let stdAuthor = cslStandardsBody(csl)
+    if (stdAuthor.acronym)
+      return toAscii(stdAuthor.acronym.toLowerCase()) + labelYear
+  }
+
+  /* A fallback solution. */
+  return toAscii(csl.DOI)
 }
 
 function createBibLabelType(csl) {
@@ -458,6 +497,7 @@ class ComponentResolver {
       .then(record => this.resolvedRecords.push(record))
       .catch(error => console.error(error))
       .finally(nil => {
+        this.resolvedRecords.sort(recordSortFunction)
         em.redraw();
         schedule50ms(this.processQueue.bind(this))
       });
@@ -480,6 +520,12 @@ class ComponentResolver {
     return URL.createObjectURL(this.createRecordsBlob());
   }
 
+}
+
+function recordSortFunction (recordP, recordQ) {
+  const labelP = recordP.label ?? null
+  const labelQ = recordQ.label ?? null
+  return labelP.localeCompare(labelQ)
 }
 
 // Utility.
