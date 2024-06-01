@@ -68,8 +68,6 @@ function resolveDoi (what) {
         .text()
         .then(content => {
           let csl = JSON.parse(content);
-          console.log(csl)
-
           return {
             success : response.ok,
             label : createBibLabelName(csl),
@@ -79,7 +77,6 @@ function resolveDoi (what) {
         })
         .catch(error => {
           console.error(error);
-
           return {
             success : false,
             bib : null,
@@ -523,8 +520,14 @@ class ComponentResolver {
 }
 
 function recordSortFunction (recordP, recordQ) {
-  const labelP = recordP.label ?? null
-  const labelQ = recordQ.label ?? null
+  const labelP = recordP.label
+  const labelQ = recordQ.label
+
+  if (! labelP)
+    return 1
+  if (! labelQ)
+    return -1
+
   return labelP.localeCompare(labelQ)
 }
 
