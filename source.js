@@ -161,7 +161,7 @@ function cslJournalVolume (csl) {
 }
 
 function cslJournalPage (csl) {
-  return csl['page'];
+  return csl['page'] || csl['article-number']
 }
 
 function cslJournalPublisher (csl) {
