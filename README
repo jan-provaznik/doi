@@ -11,6 +11,7 @@ Acknowledgments
 
 Changes
 
+  2026-08-19 Added keyboard shortcuts (Alt-R, Alt-C, Alt-W, Alt-D)
   2023-09-20 Added buttons to external links for resolved records.
   2023-09-19 Added support for TeX escape sequences for UTF-8 unfriendly 
              envrionments.
