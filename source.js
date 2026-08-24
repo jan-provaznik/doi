@@ -1,11 +1,11 @@
-/* 2021 - 2023 Jan Provaznik (jan@provaznik.pro)
+/* 2021 - 2026 Jan Provaznik (jan@provaznik.pro)
  *
  * Roses are red
  * Violets are blue
  * If bibliography makes you sad
  * This might help you
  *
- * Version 1.5-1
+ * Version 1.6-1
  *
  */
 
@@ -16,7 +16,7 @@ const TAB_SPACES = '  ';
 
 //
 
-const SCI_PREFIX = 'https://sci-hub.se/';
+const SCI_PREFIX = 'https://sci-hub.red/';
 const DOI_PREFIX = 'https://dx.doi.org/';
 
 //
@@ -324,7 +324,8 @@ class ComponentResolver {
       em('.row.apart', [
         em('button', {
           onclick     : this.handleButtonResolve.bind(this),
-          disabled    : this.isWorking
+          disabled    : this.isWorking,
+          title       : 'Alt-R'
         }, this.isWorking ? 'retrieving...' : 'retrieve biblatex entries'),
         this.isWorking ? em('.loading') : []
       ])
@@ -377,15 +378,18 @@ class ComponentResolver {
     return em('.buttons.row.together', [
       em('button', {
         onclick   : this.handleButtonClipboard.bind(this),
-        disabled  : disable
+        disabled  : disable,
+        title     : 'Alt-C'
       }, 'Copy to clipboard'),
       em('button', {
         onclick   : this.handleButtonWindow.bind(this),
-        disabled  : disable
+        disabled  : disable,
+        title     : 'Alt-W'
       }, 'Open in new window'),
       em('button.highlight', {
         onclick   : this.handleButtonDownload.bind(this),
-        disabled  : disable
+        disabled  : disable,
+        title     : 'Alt-D'
       }, 'Download database')
     ]);
   }
@@ -441,6 +445,17 @@ class ComponentResolver {
     this.resolvedRecords = [];
     this.requestQueue = [];
     this.textareaValue = '';
+
+    window.addEventListener('keyup', event => {
+      if (event.altKey && event.key == 'r')
+        this.handleButtonResolve()
+      if (event.altKey && event.key == 'c')
+        this.handleButtonClipboard()
+      if (event.altKey && event.key == 'd')
+        this.handleButtonDownload()
+      if (event.altKey && event.key == 'w')
+        this.handleButtonWindow()
+    })
   }
 
   /* Record retrieval. */
